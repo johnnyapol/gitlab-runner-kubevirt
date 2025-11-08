@@ -187,8 +187,14 @@ func CreateJobVM(
 						CloudInitNoCloud: &kubevirtapi.CloudInitNoCloudSource{
 							UserData: `
 							    #cloud-config
-								password: fedora
-								chpasswd: { expire: False }
+								users:
+								- name: gitlab-runner
+									shell: /bin/bash
+									sudo: ['ALL=(ALL) NOPASSWD:ALL']
+								ssh_pwauth: True ## This line enables ssh password authentication
+								chpasswd:
+								list: |
+									gitlab-runner:gitlab-runner ## Overriding default username, password
 								# Disable SELinux for now, so qemu-guest-agent can write the authorized_keys file
 								# The selinux-policy is too restrictive currently, see open bugs:
 								#   - https://bugzilla.redhat.com/show_bug.cgi?id=1917024
