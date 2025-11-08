@@ -152,6 +152,20 @@ func CreateJobVM(
 					},
 				},
 			},
+			AccessCredentials: []kubevirtapi.AccessCredential{
+				{
+					SSHPublicKey: &kubevirtapi.SSHPublicKeyAccessCredential{
+						PropagationMethod: kubevirtapi.SSHPublicKeyAccessCredentialPropagationMethod{
+							ConfigDrive: &kubevirtapi.ConfigDriveSSHPublicKeyAccessCredentialPropagation{},
+						},
+						Source: kubevirtapi.SSHPublicKeyAccessCredentialSource{
+							Secret: &kubevirtapi.AccessCredentialSecretSource{
+								SecretName: "my-pub-key",
+							},
+						},
+					},
+				},
+			},
 			Volumes: []kubevirtapi.Volume{
 				{
 					Name: "root",
