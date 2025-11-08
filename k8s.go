@@ -156,7 +156,11 @@ func CreateJobVM(
 				{
 					SSHPublicKey: &kubevirtapi.SSHPublicKeyAccessCredential{
 						PropagationMethod: kubevirtapi.SSHPublicKeyAccessCredentialPropagationMethod{
-							ConfigDrive: &kubevirtapi.ConfigDriveSSHPublicKeyAccessCredentialPropagation{},
+							QemuGuestAgent: &kubevirtapi.QemuGuestAgentSSHPublicKeyAccessCredentialPropagation{
+								Users: []string {
+									"fedora",
+								},
+							},
 						},
 						Source: kubevirtapi.SSHPublicKeyAccessCredentialSource{
 							Secret: &kubevirtapi.AccessCredentialSecretSource{
@@ -178,9 +182,22 @@ func CreateJobVM(
 					},
 				},
 				{
-					Name: "configdrive",
+					Name: "cloudinitdisk",
 					VolumeSource: kubevirtapi.VolumeSource{
-						CloudInitConfigDrive: &kubevirtapi.CloudInitConfigDriveSource{},
+						CloudInitNoCloud: &kubevirtapi.CloudInitNoCloudSource{
+							UserData: `
+							    #cloud-config
+								password: fedora
+								chpasswd: { expire: False }
+								# Disable SELinux for now, so qemu-guest-agent can write the authorized_keys file
+								# The selinux-policy is too restrictive currently, see open bugs:
+								#   - https://bugzilla.redhat.com/show_bug.cgi?id=1917024
+								#   - https://bugzilla.redhat.com/show_bug.cgi?id=2028762
+								#   - https://bugzilla.redhat.com/show_bug.cgi?id=2057310
+								bootcmd:
+								- setenforce 0
+							`,
+						},
 					},
 				},
 			},
