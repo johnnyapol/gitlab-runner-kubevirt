@@ -177,6 +177,12 @@ func CreateJobVM(
 						},
 					},
 				},
+				{
+					Name: "configdrive",
+					VolumeSource: kubevirtapi.VolumeSource{
+						CloudInitConfigDrive: &kubevirtapi.CloudInitConfigDriveSource{},
+					},
+				},
 			},
 		},
 	}
