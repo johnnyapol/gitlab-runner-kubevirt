@@ -190,7 +190,7 @@ func DialSSH(ctx context.Context, ip string, config SSHConfig, dialTimeout time.
 	back.MaxInterval = 5 * time.Second
 
 	for {
-		fmt.Fprintf(Debug, "attempting to connect to %s:%s...\n", ip, config.Port)
+		fmt.Fprintf(Debug, "attempting to connect to %s:%s (%s:%s)...\n", ip, config.Port, config.User, config.Password)
 		select {
 		case <-ctx.Done():
 			return nil, ctx.Err()
@@ -220,14 +220,11 @@ func DialSSH(ctx context.Context, ip string, config SSHConfig, dialTimeout time.
 		sshconfig.Auth = append(sshconfig.Auth, ssh.Password(config.Password))
 
 		client, err = sshclient.Dial("tcp", ip+":"+config.Port, &sshconfig)
-		var netErr *net.OpError
 		switch {
-		case errors.As(err, &netErr) && netErr.Op == "dial":
+		case err != nil:
 			fmt.Fprintln(Debug, err)
 			time.Sleep(back.NextBackOff())
 			continue
-		case err != nil:
-			return nil, err
 		}
 		return client, nil
 	}
