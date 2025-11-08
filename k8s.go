@@ -160,24 +160,6 @@ func CreateJobVM(
 					},
 				},
 			},
-			AccessCredentials: []kubevirtapi.AccessCredential{
-				{
-					SSHPublicKey: &kubevirtapi.SSHPublicKeyAccessCredential{
-						PropagationMethod: kubevirtapi.SSHPublicKeyAccessCredentialPropagationMethod{
-							QemuGuestAgent: &kubevirtapi.QemuGuestAgentSSHPublicKeyAccessCredentialPropagation{
-								Users: []string {
-									"fedora",
-								},
-							},
-						},
-						Source: kubevirtapi.SSHPublicKeyAccessCredentialSource{
-							Secret: &kubevirtapi.AccessCredentialSecretSource{
-								SecretName: "my-pub-key",
-							},
-						},
-					},
-				},
-			},
 			Volumes: []kubevirtapi.Volume{
 				{
 					Name: "root",
@@ -193,24 +175,9 @@ func CreateJobVM(
 					Name: "cloudinitdisk",
 					VolumeSource: kubevirtapi.VolumeSource{
 						CloudInitNoCloud: &kubevirtapi.CloudInitNoCloudSource{
-							UserData: `
-							    #cloud-config
-								users:
-								- name: gitlab-runner
-									shell: /bin/bash
-									sudo: ['ALL=(ALL) NOPASSWD:ALL']
-								ssh_pwauth: True ## This line enables ssh password authentication
-								chpasswd:
-								list: |
-									gitlab-runner:gitlab-runner ## Overriding default username, password
-								# Disable SELinux for now, so qemu-guest-agent can write the authorized_keys file
-								# The selinux-policy is too restrictive currently, see open bugs:
-								#   - https://bugzilla.redhat.com/show_bug.cgi?id=1917024
-								#   - https://bugzilla.redhat.com/show_bug.cgi?id=2028762
-								#   - https://bugzilla.redhat.com/show_bug.cgi?id=2057310
-								bootcmd:
-								- setenforce 0
-							`,
+							UserDataSecretRef: &k8sapi.LocalObjectReference{
+								Name: "cloud-init-config",
+							},
 						},
 					},
 				},
