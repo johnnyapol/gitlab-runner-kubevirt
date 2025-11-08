@@ -27,8 +27,6 @@ import (
 
 type SSHConfig struct {
 	Port     string `name:"port" default:"22" help:"Port to ssh to"`
-	User     string `name:"user" help:"ssh username"`
-	Password string `name:"password" xor:"auth" help:"ssh password"`
 	PrivKey  string `name:"private-key-file" xor:"auth" help:"ssh private key"`
 }
 
@@ -190,7 +188,7 @@ func DialSSH(ctx context.Context, ip string, config SSHConfig, dialTimeout time.
 	back.MaxInterval = 5 * time.Second
 
 	for {
-		fmt.Fprintf(Debug, "attempting to connect to %s:%s (%s:%s)...\n", ip, config.Port, config.User, config.Password)
+		fmt.Fprintf(Debug, "attempting to connect to %s:%s (%s:%s)...\n", ip, config.Port)
 		select {
 		case <-ctx.Done():
 			return nil, ctx.Err()
@@ -198,7 +196,7 @@ func DialSSH(ctx context.Context, ip string, config SSHConfig, dialTimeout time.
 		}
 
 		sshconfig := ssh.ClientConfig{
-			User:            config.User,
+			User:            "gitlab-runner",
 			Timeout:         dialTimeout,
 			HostKeyCallback: ssh.HostKeyCallback(func(hostname string, remote net.Addr, key ssh.PublicKey) error { return nil }),
 		}
@@ -217,7 +215,7 @@ func DialSSH(ctx context.Context, ip string, config SSHConfig, dialTimeout time.
 			sshconfig.Auth = append(sshconfig.Auth, ssh.PublicKeys(signer))
 		}
 
-		sshconfig.Auth = append(sshconfig.Auth, ssh.Password(config.Password))
+		sshconfig.Auth = append(sshconfig.Auth, ssh.Password("gitlab-runner"))
 
 		client, err = sshclient.Dial("tcp", ip+":"+config.Port, &sshconfig)
 		switch {
