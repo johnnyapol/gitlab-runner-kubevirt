@@ -138,6 +138,14 @@ func CreateJobVM(
 						{
 							Name: "root",
 						},
+						{
+							Name: "cloudinitdisk",
+							DiskDevice: kubevirtapi.DiskDevice{
+								Disk: &kubevirtapi.DiskTarget{
+									Bus: "virtio",
+								},
+							},
+						},
 					},
 				},
 				Clock: &kubevirtapi.Clock{
