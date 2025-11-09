@@ -181,6 +181,14 @@ func CreateJobVM(
 						},
 					},
 				},
+				{
+					Name: "emptydisk",
+					VolumeSource: kubevirtapi.VolumeSource{
+						EmptyDisk: &kubevirtapi.EmptyDiskSource{
+							Capacity:  resource.MustParse(jctx.EphemeralStorageLimit),
+						},
+					},
+				},
 			},
 		},
 	}
