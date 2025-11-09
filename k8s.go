@@ -146,6 +146,14 @@ func CreateJobVM(
 								},
 							},
 						},
+						{
+							Name: "emptydisk",
+							DiskDevice: kubevirtapi.DiskDevice{
+								Disk: &kubevirtapi.DiskTarget{
+									Bus: "virtio",
+								},
+							},
+						},
 					},
 				},
 				Clock: &kubevirtapi.Clock{
