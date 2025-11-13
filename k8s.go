@@ -191,8 +191,7 @@ func CreateJobVM(
 					Name: "cloudinitdisk",
 					VolumeSource: kubevirtapi.VolumeSource{
 						CloudInitNoCloud: &kubevirtapi.CloudInitNoCloudSource{
-							UserData: `
-#cloud-config
+							UserData: `#cloud-config
 users:
 - name: gitlab-runner
   shell: /bin/bash
@@ -202,9 +201,7 @@ users:
 ssh_pwauth: True
 bootcmd:
 - "sudo mount -t virtiofs homedir /home"
-- "sudo mount -t virtiofs cachedir /var/cache"
-
-							`,
+- "sudo mount -t virtiofs cachedir /var/cache"`,
 						},
 					},
 				},
