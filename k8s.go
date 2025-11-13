@@ -200,8 +200,8 @@ users:
   lock_passwd: false
 ssh_pwauth: True
 bootcmd:
-- "sudo mount -t virtiofs homedir /home"
-- "sudo mount -t virtiofs cachedir /var/cache"`,
+- "sudo mount -t virtiofs /dev/vdb /home"
+- "sudo mount -t virtiofs /dev/vdc /var/cache"`,
 						},
 					},
 				},
