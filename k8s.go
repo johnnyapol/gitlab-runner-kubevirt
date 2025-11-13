@@ -147,7 +147,15 @@ func CreateJobVM(
 							},
 						},
 						{
-							Name: "emptydisk",
+							Name: "homedir",
+							DiskDevice: kubevirtapi.DiskDevice{
+								Disk: &kubevirtapi.DiskTarget{
+									Bus: "virtio",
+								},
+							},
+						},
+						{
+							Name: "cachedir",
 							DiskDevice: kubevirtapi.DiskDevice{
 								Disk: &kubevirtapi.DiskTarget{
 									Bus: "virtio",
@@ -183,14 +191,33 @@ func CreateJobVM(
 					Name: "cloudinitdisk",
 					VolumeSource: kubevirtapi.VolumeSource{
 						CloudInitNoCloud: &kubevirtapi.CloudInitNoCloudSource{
-							UserDataSecretRef: &k8sapi.LocalObjectReference{
-								Name: "cloud-init-config",
-							},
+							UserData: `
+#cloud-config
+users:
+- name: gitlab-runner
+  shell: /bin/bash
+  sudo: ['ALL=(ALL) NOPASSWD:ALL']
+  plain_text_passwd: gitlab-runner
+  lock_passwd: false
+ssh_pwauth: True
+bootcmd:
+- "sudo mount -t virtiofs homedir /home"
+- "sudo mount -t virtiofs cachedir /var/cache"
+
+							`,
 						},
 					},
 				},
 				{
-					Name: "emptydisk",
+					Name: "homedir",
+					VolumeSource: kubevirtapi.VolumeSource{
+						EmptyDisk: &kubevirtapi.EmptyDiskSource{
+							Capacity:  resource.MustParse(jctx.EphemeralStorageLimit),
+						},
+					},
+				},
+				{
+					Name: "cachedir",
 					VolumeSource: kubevirtapi.VolumeSource{
 						EmptyDisk: &kubevirtapi.EmptyDiskSource{
 							Capacity:  resource.MustParse(jctx.EphemeralStorageLimit),
