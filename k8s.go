@@ -154,14 +154,6 @@ func CreateJobVM(
 								},
 							},
 						},
-						{
-							Name: "cachedir",
-							DiskDevice: kubevirtapi.DiskDevice{
-								Disk: &kubevirtapi.DiskTarget{
-									Bus: "virtio",
-								},
-							},
-						},
 					},
 				},
 				Clock: &kubevirtapi.Clock{
@@ -200,21 +192,28 @@ users:
   lock_passwd: false
 ssh_pwauth: True
 bootcmd:
-- "sudo mount -t virtiofs /dev/vdb /home"
-- "sudo mount -t virtiofs /dev/vdc /var/cache"`,
+- "lsblk"
+- "sudo mkfs -t ext4 /dev/vdb"
+- "mkdir /mnt/ephemeral"
+- "sudo mount /dev/vdb /mnt/ephemeral"
+- "mkdir /mnt/ephemeral/home"
+- "mkdir /mnt/ephemeral/varcache"
+- "mkdir /mnt/ephemeral/flatpak"
+- "mkdir /mnt/ephemeral/tmp"
+- "mkdir -p /home"
+- "mkdir -p /var/cache"
+- "mkdir -p /var/lib/flatpak"
+- "mkdir -p /tmp"
+- "mount --bind /mnt/ephemeral/home /home"
+- "mount --bind /mnt/ephemeral/varcache /var/cache"
+- "mount --bind /mnt/ephemeral/tmp /tmp"
+- "mount --bind /mnt/ephemeral/flatpak /var/lib/flatpak"
+- "chmod 777 /tmp"`,
 						},
 					},
 				},
 				{
 					Name: "homedir",
-					VolumeSource: kubevirtapi.VolumeSource{
-						EmptyDisk: &kubevirtapi.EmptyDiskSource{
-							Capacity:  resource.MustParse(jctx.EphemeralStorageLimit),
-						},
-					},
-				},
-				{
-					Name: "cachedir",
 					VolumeSource: kubevirtapi.VolumeSource{
 						EmptyDisk: &kubevirtapi.EmptyDiskSource{
 							Capacity:  resource.MustParse(jctx.EphemeralStorageLimit),
