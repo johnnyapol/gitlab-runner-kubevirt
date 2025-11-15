@@ -33,18 +33,27 @@ type PrepareCmd struct {
 	RunConfig `embed`
 }
 
+// https://stackoverflow.com/a/45978733
+func getEnv(key, fallback string) string {
+    value, exists := os.LookupEnv(key)
+    if !exists {
+        value = fallback
+    }
+    return value
+}
+
 func (cmd *PrepareCmd) Run(ctx context.Context, client kubevirt.KubevirtClient, jctx *JobContext) error {
 	if jctx.CPURequest == "" {
-		jctx.CPURequest = cmd.DefaultCPURequest
+		jctx.CPURequest = getEnv("KUBERNETES_CPU_REQUEST", cmd.DefaultCPURequest)
 	}
 	if jctx.CPULimit == "" {
-		jctx.CPULimit = cmd.DefaultCPULimit
+		jctx.CPULimit = getEnv("KUBERNETES_CPU_LIMIT", cmd.DefaultCPULimit)
 	}
 	if jctx.MemoryRequest == "" {
-		jctx.MemoryRequest = cmd.DefaultMemoryRequest
+		jctx.MemoryRequest = getEnv("KUBERNETES_MEMORY_REQUEST", cmd.DefaultMemoryRequest)
 	}
 	if jctx.MemoryLimit == "" {
-		jctx.MemoryLimit = cmd.DefaultMemoryLimit
+		jctx.MemoryLimit = getEnv("KUBERNETES_MEMORY_LIMIT", cmd.DefaultMemoryLimit)
 	}
 	if jctx.EphemeralStorageRequest == "" {
 		jctx.EphemeralStorageRequest = cmd.DefaultEphemeralStorageRequest
