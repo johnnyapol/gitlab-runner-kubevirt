@@ -191,6 +191,9 @@ users:
   plain_text_passwd: gitlab-runner
   lock_passwd: false
 ssh_pwauth: True
+runcmd:
+- "wget https://s3.dualstack.us-east-1.amazonaws.com/gitlab-runner-downloads/v17.7.1/binaries/gitlab-runner-linux-amd64 -O /usr/local/bin/gitlab-runner"
+- "echo \"8226950239d9a1067f00aa8347b5f29423d0d94d65ab80f32d1270875e5d4bc1 /usr/local/bin/gitlab-runner\" | sha256sum -c && chmod +x /usr/local/bin/gitlab-runner"
 bootcmd:
 - "lsblk"
 - "sudo mkfs -t ext4 /dev/vdb"
