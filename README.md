@@ -2,6 +2,10 @@
 
 A Gitlab Runner custom executor for running jobs in VMs on kubernetes
 
+## Note
+
+This is an opionated fork of https://github.com/logan2211/gitlab-runner-kubevirt . This currently assumes you are using a containerdisk image where cloud-init is functional. I'm also only targeting Linux VMs and have some hardcoded references to flatpak, since this was really about being able to build flatpaks in GLCI without having to have an always-on VM, manually spinup a runner, or using privileged pods. At some point in the future, I may find the time to rework my various changes and "upstream" (Logan2211' repo is actually also a fork, but the original maintainer seems to be preoccupied with other things, so their repo was my starting base). 
+
 ## Usage
 
 Before you begin, make sure that KubeVirt has been installed
